@@ -1,12 +1,14 @@
 from djoser.serializers import UserSerializer, UserCreateSerializer
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 from .models import User, Subscriptions
 
 
 
 class CustomUserSerializer(UserSerializer):
-    is_subscribed222 = serializers.SerializerMethodField(read_only=True)
+    """
+    Переопределяем набор полей сериализатора пользователя из djoser.
+    """
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -16,10 +18,10 @@ class CustomUserSerializer(UserSerializer):
             'username',
             'first_name',
             'last_name',
-            'is_subscribed222'
+            'is_subscribed'
         )
 
-    def get_is_subscribed222(self, obj):
+    def get_is_subscribed(self, obj):
         request = self.context.get('request')
         return Subscriptions.objects.filter(
             user=request.user,
@@ -28,6 +30,9 @@ class CustomUserSerializer(UserSerializer):
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
+    """
+    Переопределяем набор полей сериализатора создания пользователя из djoser.
+    """
 
     class Meta:
         model = User
@@ -41,35 +46,10 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class SubscriptionsSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault(),
-    )
-    author = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=User.objects.all(),
-    )
-
-    class Meta:
-        model = Subscriptions
-        fields = ('user', 'author')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Subscriptions.objects.all(),
-                fields=('user', 'author')
-            )
-        ]
-
-    def validate_author(self, value):
-        if value == self.context.get('request').user:
-            raise serializers.ValidationError(
-                'Невозможно подписаться на самого себя!'
-            )
-        return value
-
-
-class SubscriptionsListSerializer(serializers.ModelSerializer):
+    """
+    Данные пользователя (автора), на которого подписан текущий пользователь.
+    В выдачу добавляются рецепты.
+    """
     #recipes = serializers.RecipeSerializer(many=True, read_only=True)
     # recipes_count = serializers.SerializerMethodField(read_only=True)
     email = serializers.ReadOnlyField(source='author.email')
@@ -78,7 +58,6 @@ class SubscriptionsListSerializer(serializers.ModelSerializer):
     first_name = serializers.ReadOnlyField(source='author.first_name')
     last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField(read_only=True)
-
 
     class Meta:
         model = Subscriptions
