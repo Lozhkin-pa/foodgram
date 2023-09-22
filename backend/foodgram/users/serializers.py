@@ -1,7 +1,8 @@
 from djoser.serializers import UserSerializer, UserCreateSerializer
 from rest_framework import serializers
 from .models import User, Subscriptions
-
+from recipes.models import Recipe
+from recipes.serializers import RecipeSerializer
 
 
 class CustomUserSerializer(UserSerializer):
@@ -50,14 +51,14 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
     Данные пользователя (автора), на которого подписан текущий пользователь.
     В выдачу добавляются рецепты.
     """
-    #recipes = serializers.RecipeSerializer(many=True, read_only=True)
-    # recipes_count = serializers.SerializerMethodField(read_only=True)
     email = serializers.ReadOnlyField(source='author.email')
     id = serializers.ReadOnlyField(source='author.id')
     username = serializers.ReadOnlyField(source='author.username')
     first_name = serializers.ReadOnlyField(source='author.first_name')
     last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField(read_only=True)
+    recipes = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Subscriptions
@@ -68,8 +69,8 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
-            # 'recipes',
-            # 'recipes_count'
+            'recipes',
+            'recipes_count'
         )
     
     def get_is_subscribed(self, obj):
@@ -79,5 +80,12 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
             author=obj.author
         ).exists()
     
-    # def get_recipes_count(self, obj):
-    #     return obj.recipes.count()
+    def get_recipes(self, obj):
+        queryset = Recipe.objects.filter(author=obj.author)
+        serializer = RecipeSerializer(queryset, many=True)
+        return serializer.data
+    
+    def get_recipes_count(self, obj):
+        recipes = Recipe.objects.filter(author=obj.author)
+        return recipes.count()
+
