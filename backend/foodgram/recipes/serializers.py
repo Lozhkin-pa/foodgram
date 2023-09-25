@@ -1,8 +1,15 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .utils import Base64ImageField
-from .models import Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe, Favorite, Shopping_cart
 from users.serializers import CustomUserSerializer
+from .models import (
+    Tag,
+    Ingredient,
+    Recipe,
+    IngredientRecipe,
+    Favorite,
+    Shopping_cart
+)
 
 User = get_user_model()
 
@@ -44,6 +51,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientsRecipeReadSerializer(serializers.ModelSerializer):
+    """
+    Сериализотор для выбора конкретных ингредиентов при чтении рецепта.
+    """
     id = serializers.IntegerField(source='ingredient.id', read_only=True)
     name = serializers.CharField(source='ingredient.name', read_only=True)
     measurement_unit = serializers.CharField(
@@ -62,6 +72,9 @@ class IngredientsRecipeReadSerializer(serializers.ModelSerializer):
 
 
 class RecipesReadSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для чтения рецепта.
+    """
     tags = TagSerializer(many=True, read_only=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = IngredientsRecipeReadSerializer(
@@ -102,8 +115,10 @@ class RecipesReadSerializer(serializers.ModelSerializer):
 
 
 class IngredientsRecipeCreateUpdateSerializer(serializers.ModelSerializer):
+    """
+    Сериализотор для записи ингредиентов к конкретному рецепту.
+    """
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    # id = serializers.IntegerField(source='ingredient.id')
 
     class Meta:
         model = IngredientRecipe
@@ -114,6 +129,9 @@ class IngredientsRecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
+    """
+    Сериализотор для создания и редактирования рецепта.
+    """
     ingredients = IngredientsRecipeCreateUpdateSerializer(
         source='recipe_ingredients',
         many=True

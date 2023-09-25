@@ -4,6 +4,9 @@ from .serializers import TagSerializer, IngredientSerializer, RecipesReadSeriali
 from .permissions import IsAuthorOrReadOnly
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import RecipeFilter
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.shortcuts import get_object_or_404, HttpResponse
 from django.db.models import Sum
@@ -20,11 +23,16 @@ class ListRetrieveViewSet(
 class TagViewSet(ListRetrieveViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = None
 
 
 class IngredientViewSet(ListRetrieveViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    pagination_class = None
+    filter_backends = (SearchFilter,)
+    search_fields = ('^name',) 
+
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -34,6 +42,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
     
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -178,7 +188,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             txt_file.append(
                 (
                     f'#{number} {ingredient.get("recipe__ingredients__name")} '
-                    f'({ingredient.get("recipe__ingredients__measurement_unit")}) '
+                    f'({ingredient.get("recipe__ingredients__measurement_unit")}) - '
                     f'{ingredient.get("amount")}'
                 )
             )
