@@ -1,5 +1,5 @@
 from rest_framework import mixins, viewsets, status
-from .models import Tag, Ingredient, Recipe, TagRecipe, IngredientRecipe, Favorite, Shopping_cart
+from .models import Tag, Ingredient, Recipe, Favorite, Shopping_cart
 from .serializers import TagSerializer, IngredientSerializer, RecipesReadSerializer, RecipeCreateUpdateSerializer, RecipeSerializer
 from .permissions import IsAuthorOrReadOnly
 from rest_framework.decorators import action
@@ -76,13 +76,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 user=request.user,
                 recipe=recipe
             )
-            serializer = RecipeSerializer(
-                recipe,
-                data=request.data,
-                context={'request': request}
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            serializer = RecipeSerializer(recipe)
             return Response(
                 data=serializer.data,
                 status=status.HTTP_201_CREATED
@@ -128,13 +122,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 user=request.user,
                 recipe=recipe
             )
-            serializer = RecipeSerializer(
-                recipe,
-                data=request.data,
-                context={'request': request}
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            serializer = RecipeSerializer(recipe)
             return Response(
                 data=serializer.data,
                 status=status.HTTP_201_CREATED

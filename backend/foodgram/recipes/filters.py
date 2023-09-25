@@ -3,7 +3,8 @@ from recipes.models import Tag, Recipe
 from django_filters.rest_framework import (
     FilterSet,
     ModelMultipleChoiceFilter,
-    BooleanFilter
+    BooleanFilter,
+    ModelChoiceFilter
 )
 
 User = get_user_model()
@@ -11,8 +12,12 @@ User = get_user_model()
 
 class RecipeFilter(FilterSet):
     """
-    Фильтрация рецептов по тегам (слагу тега).
+    Фильтрация рецептов по тегам (слагу тега), автору, избранному и списку
+    покупок.
     """
+    author = ModelChoiceFilter(
+        queryset=User.objects.all()
+    )
     tags = ModelMultipleChoiceFilter(
         queryset=Tag.objects.all(),
         field_name='tags__slug',
@@ -38,6 +43,7 @@ class RecipeFilter(FilterSet):
     class Meta:
         model = Recipe
         fields = (
+            'author',
             'tags',
             'is_favorited',
             'is_in_shopping_cart'

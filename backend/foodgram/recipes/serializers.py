@@ -186,3 +186,11 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             )
         instance.save()
         return instance
+    
+    def to_representation(self, obj):
+        request = self.context.get('request')
+        serializer = RecipesReadSerializer(
+            obj,
+            context={'request': request}
+        )
+        return serializer.data
