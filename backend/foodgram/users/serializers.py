@@ -23,8 +23,8 @@ class CustomUserSerializer(UserSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         return Subscriptions.objects.filter(
-            user=request.user,
-            author=obj
+            user=request.user.id,
+            author=obj.id
         ).exists()
 
 

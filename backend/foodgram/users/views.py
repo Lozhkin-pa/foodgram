@@ -1,9 +1,10 @@
 from djoser.views import UserViewSet
-from .serializers import SubscriptionsSerializer
+from .subscriptions_serializer import SubscriptionsSerializer
 from .models import Subscriptions, User
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 
@@ -13,17 +14,16 @@ class CustomUserViewSet(UserViewSet):
     Добавлены специальные маршрутизируемые методы для работы с подписками.
     """
 
-    @action(detail=True, methods=['post', 'delete'])
+    @action(
+            detail=True,
+            methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated]
+    )
     def subscribe(self, request, id):
         """
         Подписаться/отписаться от пользователя.
         """
         author = get_object_or_404(User, id=id)
-        if request.user == author:
-            return Response(
-                {'errors': 'Действия с собственным профилем невозможны!'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         if request.method == 'POST':
             if Subscriptions.objects.filter(
                 user=request.user,
@@ -62,7 +62,10 @@ class CustomUserViewSet(UserViewSet):
             subscriptions_obj.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False)
+    @action(
+            detail=False,
+            permission_classes=[IsAuthenticated]
+    )
     def subscriptions(self, request):
         """
         Возвращает пользователей (авторов), на которых подписан текущий

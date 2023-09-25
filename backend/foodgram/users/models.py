@@ -24,15 +24,15 @@ class User(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
         ordering = ('-id',)
-        # constraints = [
-        #     models.UniqueConstraint(
-        #         fields=['username', 'email'],
-        #         name='unique_username_email'
-        #     )
-        # ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['username', 'email'],
+                name='unique_username_email'
+            )
+        ]
     
     def __str__(self):
-        return f'{self.username}'
+        return self.username
 
 
 class Subscriptions(models.Model):
@@ -63,6 +63,4 @@ class Subscriptions(models.Model):
         ]
     
     def __str__(self):
-        return (f'Пользователь {self.user.username} '
-                f'подписан на автора {self.author.username}'
-                )
+        return f'{self.user.username} подписан на {self.author.username}'
