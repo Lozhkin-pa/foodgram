@@ -35,7 +35,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
             'recipes',
             'recipes_count'
         )
-    
+
     def validate(self, data):
         request = self.context.get('request')
         author = data.get('author')
@@ -52,7 +52,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
             user=request.user,
             author=obj.author
         ).exists()
-    
+
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.query_params.get('recipes_limit')
@@ -61,7 +61,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
             recipes = recipes[:int(limit)]
         serializer = RecipeSerializer(recipes, many=True)
         return serializer.data
-    
+
     def get_recipes_count(self, obj):
         recipes = Recipe.objects.filter(author=obj.author)
         return recipes.count()

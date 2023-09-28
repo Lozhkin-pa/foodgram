@@ -17,7 +17,7 @@ class Command(BaseCommand):
                 'r',
                 encoding='utf-8'
             ) as csv_file:
-                
+
                 csv_reader = csv.reader(csv_file)
                 for row in csv_reader:
                     Ingredient.objects.create(
@@ -26,7 +26,7 @@ class Command(BaseCommand):
                     )
 
             self.stdout.write(
-                self.style.SUCCESS(f'Файл ingredients.csv загружен!')
+                self.style.SUCCESS('Файл ingredients.csv загружен!')
             )
         except ValueError as error:
             print(f'Ошибка при загрузке файла ingredients.csv: {error}')

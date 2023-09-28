@@ -30,7 +30,7 @@ class Tag(models.Model):
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
         ordering = ('-id',)
-    
+
     def __str__(self):
         return self.name
 
@@ -39,12 +39,10 @@ class Ingredient(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name='Название ингредиента',
-        # unique=True,
     )
     measurement_unit = models.CharField(
         max_length=200,
         verbose_name='Единицы измерения',
-        # unique=True,
     )
 
     class Meta:
@@ -57,14 +55,14 @@ class Ingredient(models.Model):
                 name='unique_name_measurement_unit'
             )
         ]
-    
+
     def __str__(self):
         return self.name
 
 
 class Recipe(models.Model):
     ingredients = models.ManyToManyField(
-        Ingredient, 
+        Ingredient,
         through='IngredientRecipe',
         verbose_name='Ингредиенты'
     )
@@ -107,7 +105,7 @@ class Recipe(models.Model):
                 name='unique_name_author'
             )
         ]
-    
+
     def __str__(self):
         return self.name
 
@@ -199,7 +197,7 @@ class Favorite(models.Model):
                 name='unique_user_recipe_favorite',
             )
         ]
-    
+
     def __str__(self):
         return f'{self.user.username}: {self.recipe.name}'
 
@@ -231,6 +229,6 @@ class Shopping_cart(models.Model):
                 name='unique_user_recipe_shopping_cart',
             )
         ]
-    
+
     def __str__(self):
         return f'{self.user.username}: {self.recipe.name}'

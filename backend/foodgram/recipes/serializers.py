@@ -98,14 +98,14 @@ class RecipesReadSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time'
         )
-    
+
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         return Favorite.objects.filter(
             user=request.user.id,
             recipe=obj
         ).exists()
-    
+
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         return Shopping_cart.objects.filter(
@@ -152,7 +152,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time'
         )
-    
+
     def create(self, validated_data):
         ingredients_data = validated_data.pop('recipe_ingredients')
         tags_data = validated_data.pop('tags')
@@ -165,12 +165,14 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 amount=ingredient.get('amount')
             )
         return recipe
-    
+
     def update(self, instance, validated_data):
         instance.image = validated_data.get('image', instance.image)
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time
+        )
 
         ingredients_data = validated_data.pop('recipe_ingredients')
         tags_data = validated_data.pop('tags')
@@ -186,7 +188,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             )
         instance.save()
         return instance
-    
+
     def to_representation(self, obj):
         request = self.context.get('request')
         serializer = RecipesReadSerializer(

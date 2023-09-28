@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import (Tag, Ingredient, Recipe, IngredientRecipe, TagRecipe, Favorite, Shopping_cart)
+from .models import (
+    Tag,
+    Ingredient,
+    Recipe,
+    IngredientRecipe,
+    TagRecipe,
+    Favorite,
+    Shopping_cart
+)
 
 
 class RecipesAdmin(admin.ModelAdmin):
@@ -50,6 +58,7 @@ class Shopping_cartAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'recipe',)
     search_fields = ('recipe__name', 'user__username')
     list_filter = ('recipe__name', 'user__username')
+
 
 admin.site.register(Recipe, RecipesAdmin)
 admin.site.register(Tag, TagsAdmin)

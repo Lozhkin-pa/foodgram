@@ -1,15 +1,23 @@
 from rest_framework import mixins, viewsets, status
 from .models import Tag, Ingredient, Recipe, Favorite, Shopping_cart
-from .serializers import TagSerializer, IngredientSerializer, RecipesReadSerializer, RecipeCreateUpdateSerializer, RecipeSerializer
-from .permissions import IsAuthorOrReadOnly
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import RecipeFilter
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated
+)
 from django.shortcuts import get_object_or_404, HttpResponse
 from django.db.models import Sum
+from .serializers import (
+    TagSerializer,
+    IngredientSerializer,
+    RecipesReadSerializer,
+    RecipeCreateUpdateSerializer,
+    RecipeSerializer
+)
 
 
 class ListRetrieveViewSet(
@@ -98,7 +106,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             favorite_obj.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-
     @action(
             detail=True,
             methods=['post', 'delete'],
@@ -168,18 +175,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).annotate(
             amount = Sum('recipe__recipe_ingredients__amount')
         )
-
         txt_file = []
         txt_file.append(f'"Список продуктов"')
         number = 1
         for ingredient in ingredients:
-            txt_file.append(
-                (
-                    f'#{number} {ingredient.get("recipe__ingredients__name")} '
-                    f'({ingredient.get("recipe__ingredients__measurement_unit")}) - '
-                    f'{ingredient.get("amount")}'
-                )
-            )
+            txt_file.append((
+                f'#{number} {ingredient.get("recipe__ingredients__name")} '
+                f'({ingredient.get("recipe__ingredients__measurement_unit")}) - '
+                f'{ingredient.get("amount")}'
+            ))
             number += 1
         response = HttpResponse(
             content='\n'.join(txt_file),
