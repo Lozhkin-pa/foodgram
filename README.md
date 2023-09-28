@@ -81,6 +81,14 @@ Foodgram - сайт, на котором пользователи могут п�
 > sudo docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser
 ```
 
+### __Суперпользователь__
+```
+https://myfoodgramproject.sytes.net/
+usermane: Admin
+email: admin@mail.ru
+password: Admin
+```
+
 ### __Примеры запросов__
 
 - **GET:** http://127.0.0.1:8000/api/users/  - показать список всех пользователей.

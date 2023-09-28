@@ -39,8 +39,7 @@ class IngredientViewSet(ListRetrieveViewSet):
     serializer_class = IngredientSerializer
     pagination_class = None
     filter_backends = (SearchFilter,)
-    search_fields = ('^name',) 
-
+    search_fields = ('^name',)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -52,7 +51,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return RecipesReadSerializer
@@ -60,11 +59,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-    
+
     @action(
-            detail=True,
-            methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=['post', 'delete'],
+        permission_classes=[IsAuthenticated]
     )
     def favorite(self, request, pk):
         """
@@ -107,9 +106,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-            detail=True,
-            methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=['post', 'delete'],
+        permission_classes=[IsAuthenticated]
     )
     def shopping_cart(self, request, pk):
         """
@@ -151,10 +150,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             favorite_obj.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-
     @action(
-            detail=False,
-            permission_classes=[IsAuthenticated]
+        detail=False,
+        permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
         """
@@ -164,25 +162,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
             user=request.user
         ).exists:
             return Response(
-                    {'errors': 'Список покупок пуст!'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                {'errors': 'Список покупок пуст!'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         ingredients = Shopping_cart.objects.filter(
             user=request.user
         ).values(
             'recipe__ingredients__name',
             'recipe__ingredients__measurement_unit'
         ).annotate(
-            amount = Sum('recipe__recipe_ingredients__amount')
+            amount=Sum('recipe__recipe_ingredients__amount')
         )
         txt_file = []
-        txt_file.append(f'"Список продуктов"')
+        txt_file.append('***Список продуктов***')
         number = 1
-        for ingredient in ingredients:
+        for obj in ingredients:
             txt_file.append((
-                f'#{number} {ingredient.get("recipe__ingredients__name")} '
-                f'({ingredient.get("recipe__ingredients__measurement_unit")}) - '
-                f'{ingredient.get("amount")}'
+                f'#{number} {obj.get("recipe__ingredients__name")} '
+                f'({obj.get("recipe__ingredients__measurement_unit")}) - '
+                f'{obj.get("amount")}'
             ))
             number += 1
         response = HttpResponse(
@@ -190,6 +188,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             content_type='text/plain; charset=UTF-8',
         )
         response['Content-Disposition'] = (
-            f'attachment; filename=Shopping_list.txt'
+            'attachment; filename=Shopping_list.txt'
         )
         return response

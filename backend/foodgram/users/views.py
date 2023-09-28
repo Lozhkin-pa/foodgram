@@ -15,9 +15,9 @@ class CustomUserViewSet(UserViewSet):
     """
 
     @action(
-            detail=True,
-            methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=['post', 'delete'],
+        permission_classes=[IsAuthenticated]
     )
     def subscribe(self, request, id):
         """
@@ -63,8 +63,8 @@ class CustomUserViewSet(UserViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-            detail=False,
-            permission_classes=[IsAuthenticated]
+        detail=False,
+        permission_classes=[IsAuthenticated]
     )
     def subscriptions(self, request):
         """
