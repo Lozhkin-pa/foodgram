@@ -2,11 +2,11 @@
 SubscriptionsSerializer вынес в отдельный файл для избежания циклического
 импорта между users.serializers и recipes.serializers.
 """
-from rest_framework import serializers, status
+from rest_framework import serializers
 from .models import Subscriptions
-from recipes.models import Recipe
+# from recipes.models import Recipe
 from recipes.serializers import RecipeSerializer
-from rest_framework.response import Response
+# from rest_framework.response import Response
 
 
 class SubscriptionsSerializer(serializers.ModelSerializer):
@@ -23,6 +23,38 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
     recipes = serializers.SerializerMethodField(read_only=True)
     recipes_count = serializers.SerializerMethodField(read_only=True)
 
+    def validate(self, data):
+        request = self.context.get('request')
+        author = data.get('author')
+        if request.user == author:
+            return serializers.ValidationError(
+                'Действия с собственным профилем невозможны!'
+            )
+        return data
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        return obj.subscribers.filter(user=request.user).exists()
+        # return Subscriptions.objects.filter(
+        #     user=request.user,
+        #     author=obj.author
+        # ).exists()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.query_params.get('recipes_limit')
+        # recipes = Recipe.objects.filter(author=obj.author)
+        recipes = obj.recipes.filter(author=obj.author)
+        if limit:
+            recipes = recipes[:int(limit)]
+        serializer = RecipeSerializer(recipes, many=True)
+        return serializer.data
+
+    def get_recipes_count(self, obj):
+        # recipes = Recipe.objects.filter(author=obj.author)
+        recipes = obj.recipes.filter(author=obj.author)
+        return recipes.count()
+
     class Meta:
         model = Subscriptions
         fields = (
@@ -35,33 +67,3 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
             'recipes',
             'recipes_count'
         )
-
-    def validate(self, data):
-        request = self.context.get('request')
-        author = data.get('author')
-        if request.user == author:
-            return Response(
-                {'errors': 'Действия с собственным профилем невозможны!'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        return data
-
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        return Subscriptions.objects.filter(
-            user=request.user,
-            author=obj.author
-        ).exists()
-
-    def get_recipes(self, obj):
-        request = self.context.get('request')
-        limit = request.query_params.get('recipes_limit')
-        recipes = Recipe.objects.filter(author=obj.author)
-        if limit:
-            recipes = recipes[:int(limit)]
-        serializer = RecipeSerializer(recipes, many=True)
-        return serializer.data
-
-    def get_recipes_count(self, obj):
-        recipes = Recipe.objects.filter(author=obj.author)
-        return recipes.count()

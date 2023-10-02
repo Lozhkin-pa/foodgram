@@ -1,16 +1,16 @@
 from rest_framework import mixins, viewsets, status
-from .models import Tag, Ingredient, Recipe, Favorite, Shopping_cart
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from .filters import RecipeFilter
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
     IsAuthenticated
 )
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404, HttpResponse
 from django.db.models import Sum
+from .filters import RecipeFilter
+from .models import Tag, Ingredient, Recipe, Favorite, ShoppingCart
 from .serializers import (
     TagSerializer,
     IngredientSerializer,
@@ -71,14 +71,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
         recipe = get_object_or_404(Recipe, pk=pk)
         if request.method == 'POST':
-            if Favorite.objects.filter(
-                user=request.user,
-                recipe=recipe
-            ).exists():
-                return Response(
-                    {'errors': 'Рецепт уже добавлен в избранное!'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            # if Favorite.objects.filter(
+            #     user=request.user,
+            #     recipe=recipe
+            # ).exists():
+            #     return Response(
+            #         {'errors': 'Рецепт уже добавлен в избранное!'},
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
             Favorite.objects.create(
                 user=request.user,
                 recipe=recipe
@@ -89,14 +89,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_201_CREATED
             )
         if request.method == 'DELETE':
-            if not Favorite.objects.filter(
-                user=request.user,
-                recipe=recipe
-            ).exists():
-                return Response(
-                    {'errors': 'Рецепт не добавлен в избранное!'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            # if not Favorite.objects.filter(
+            #     user=request.user,
+            #     recipe=recipe
+            # ).exists():
+            #     return Response(
+            #         {'errors': 'Рецепт не добавлен в избранное!'},
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
             favorite_obj = get_object_or_404(
                 Favorite,
                 user=request.user,
@@ -116,15 +116,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
         recipe = get_object_or_404(Recipe, pk=pk)
         if request.method == 'POST':
-            if Shopping_cart.objects.filter(
-                user=request.user,
-                recipe=recipe
-            ).exists():
-                return Response(
-                    {'errors': 'Рецепт уже добавлен в список покупок!'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            Shopping_cart.objects.create(
+            # if ShoppingCart.objects.filter(
+            #     user=request.user,
+            #     recipe=recipe
+            # ).exists():
+            #     return Response(
+            #         {'errors': 'Рецепт уже добавлен в список покупок!'},
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
+            ShoppingCart.objects.create(
                 user=request.user,
                 recipe=recipe
             )
@@ -134,16 +134,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_201_CREATED
             )
         if request.method == 'DELETE':
-            if not Shopping_cart.objects.filter(
-                user=request.user,
-                recipe=recipe
-            ).exists():
-                return Response(
-                    {'errors': 'Рецепт не добавлен в список покупок!'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            # if not ShoppingCart.objects.filter(
+            #     user=request.user,
+            #     recipe=recipe
+            # ).exists():
+            #     return Response(
+            #         {'errors': 'Рецепт не добавлен в список покупок!'},
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
             favorite_obj = get_object_or_404(
-                Shopping_cart,
+                ShoppingCart,
                 user=request.user,
                 recipe=recipe
             )
@@ -158,14 +158,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
         Скачивает файл со списком покупок в формате txt.
         """
-        if not Shopping_cart.objects.filter(
+        if not ShoppingCart.objects.filter(
             user=request.user
         ).exists:
             return Response(
                 {'errors': 'Список покупок пуст!'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        ingredients = Shopping_cart.objects.filter(
+        ingredients = ShoppingCart.objects.filter(
             user=request.user
         ).values(
             'recipe__ingredients__name',
@@ -174,7 +174,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             amount=Sum('recipe__recipe_ingredients__amount')
         )
         txt_file = []
-        txt_file.append('***Список продуктов***')
+        txt_file.append('***СПИСОК ПРОДУКТОВ***')
         number = 1
         for obj in ingredients:
             txt_file.append((

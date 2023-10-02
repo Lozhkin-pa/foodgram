@@ -202,7 +202,7 @@ class Favorite(models.Model):
         return f'{self.user.username}: {self.recipe.name}'
 
 
-class Shopping_cart(models.Model):
+class ShoppingCart(models.Model):
     """
     Список покупок - связка пользователя и выбранных рецептов.
     """

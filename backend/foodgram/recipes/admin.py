@@ -6,10 +6,11 @@ from .models import (
     IngredientRecipe,
     TagRecipe,
     Favorite,
-    Shopping_cart
+    ShoppingCart
 )
 
 
+@admin.register(Recipe)
 class RecipesAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
@@ -24,46 +25,43 @@ class RecipesAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
+@admin.register(Ingredient)
 class IngredientsAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'measurement_unit',)
     search_fields = ('name',)
     list_filter = ('name',)
 
 
+@admin.register(Tag)
 class TagsAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'color', 'slug',)
     search_fields = ('name',)
     list_filter = ('name',)
 
 
+@admin.register(IngredientRecipe)
 class IngredientRecipeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'recipe', 'ingredient', 'amount')
     search_fields = ('recipe__name', 'ingredient__name',)
     list_filter = ('recipe__name', 'ingredient__name',)
 
 
+@admin.register(TagRecipe)
 class TagRecipeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'recipe', 'tag',)
     search_fields = ('recipe__name', 'tag__name')
     list_filter = ('recipe__name', 'tag__name')
 
 
+@admin.register(Favorite)
 class FavoritesAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'recipe',)
     search_fields = ('recipe__name', 'user__username')
     list_filter = ('recipe__name', 'user__username')
 
 
+@admin.register(ShoppingCart)
 class Shopping_cartAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'recipe',)
     search_fields = ('recipe__name', 'user__username')
     list_filter = ('recipe__name', 'user__username')
-
-
-admin.site.register(Recipe, RecipesAdmin)
-admin.site.register(Tag, TagsAdmin)
-admin.site.register(Ingredient, IngredientsAdmin)
-admin.site.register(IngredientRecipe, IngredientRecipeAdmin)
-admin.site.register(TagRecipe, TagRecipeAdmin)
-admin.site.register(Favorite, FavoritesAdmin)
-admin.site.register(Shopping_cart, Shopping_cartAdmin)

@@ -1,6 +1,6 @@
 from djoser.serializers import UserSerializer, UserCreateSerializer
 from rest_framework import serializers
-from .models import User, Subscriptions
+from .models import User
 
 
 class CustomUserSerializer(UserSerializer):
@@ -8,6 +8,14 @@ class CustomUserSerializer(UserSerializer):
     Переопределяем набор полей сериализатора пользователя из djoser.
     """
     is_subscribed = serializers.SerializerMethodField(read_only=True)
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        return obj.subscribers.filter(user=request.user.id).exists()
+        # return Subscriptions.objects.filter(
+        #     user=request.user.id,
+        #     author=obj.id
+        # ).exists()
 
     class Meta:
         model = User
@@ -19,13 +27,6 @@ class CustomUserSerializer(UserSerializer):
             'last_name',
             'is_subscribed'
         )
-
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        return Subscriptions.objects.filter(
-            user=request.user.id,
-            author=obj.id
-        ).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
