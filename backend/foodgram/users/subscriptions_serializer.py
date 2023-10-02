@@ -4,9 +4,7 @@ SubscriptionsSerializer вынес в отдельный файл для изб�
 """
 from rest_framework import serializers
 from .models import Subscriptions
-# from recipes.models import Recipe
 from recipes.serializers import RecipeSerializer
-# from rest_framework.response import Response
 
 
 class SubscriptionsSerializer(serializers.ModelSerializer):
@@ -35,15 +33,10 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         return obj.author.subscribers.filter(user=request.user).exists()
-        # return Subscriptions.objects.filter(
-        #     user=request.user,
-        #     author=obj.author
-        # ).exists()
 
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.query_params.get('recipes_limit')
-        # recipes = Recipe.objects.filter(author=obj.author)
         recipes = obj.author.recipes.filter(author=obj.author)
         if limit:
             recipes = recipes[:int(limit)]
@@ -51,7 +44,6 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_recipes_count(self, obj):
-        # recipes = Recipe.objects.filter(author=obj.author)
         recipes = obj.author.recipes.filter(author=obj.author)
         return recipes.count()
 

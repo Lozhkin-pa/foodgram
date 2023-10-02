@@ -25,14 +25,6 @@ class CustomUserViewSet(UserViewSet):
         """
         author = get_object_or_404(User, id=id)
         if request.method == 'POST':
-            # if Subscriptions.objects.filter(
-            #     user=request.user,
-            #     author=author
-            # ).exists():
-            #     return Response(
-            #         {'errors': 'Вы уже подписаны на данного пользователя!'},
-            #         status=status.HTTP_400_BAD_REQUEST
-            #     )
             subscriptions_obj = Subscriptions.objects.create(
                 user=request.user,
                 author=author
@@ -46,14 +38,6 @@ class CustomUserViewSet(UserViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
-            # if not Subscriptions.objects.filter(
-            #     user=request.user,
-            #     author=author
-            # ).exists():
-            #     return Response(
-            #         {'errors': 'Вы не подписаны на данного пользователя!'},
-            #         status=status.HTTP_400_BAD_REQUEST
-            #     )
             subscriptions_obj = get_object_or_404(
                 Subscriptions,
                 user=request.user,

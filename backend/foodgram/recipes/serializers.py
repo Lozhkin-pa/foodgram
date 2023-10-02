@@ -86,18 +86,10 @@ class RecipesReadSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         return obj.favorites.filter(user=request.user.id).exists()
-        # return Favorite.objects.filter(
-        #     user=request.user.id,
-        #     recipe=obj
-        # ).exists()
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         return obj.shopping_cart.filter(user=request.user.id).exists()
-        # return ShoppingCart.objects.filter(
-        #     user=request.user.id,
-        #     recipe=obj
-        # ).exists()
 
     class Meta:
         model = Recipe
@@ -166,12 +158,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags_data)
         self.__add_ingredients(recipe, ingredients_data)
-        # for ingredient in ingredients_data:
-        #     IngredientRecipe.objects.create(
-        #         recipe=recipe,
-        #         ingredient=ingredient.get('id'),
-        #         amount=ingredient.get('amount')
-        #     )
         return recipe
 
     @transaction.atomic
@@ -188,13 +174,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         recipe_obj = IngredientRecipe.objects.filter(recipe=instance)
         recipe_obj.delete()
         instance.tags.set(tags_data)
-        self.__add_ingredients(recipe_obj, ingredients_data)
-        # for ingredient in ingredients_data:
-        #     IngredientRecipe.objects.create(
-        #         recipe=instance,
-        #         ingredient=ingredient.get('id'),
-        #         amount=ingredient.get('amount')
-        #     )
+        self.__add_ingredients(instance, ingredients_data)
         instance.save()
         return instance
 
@@ -216,27 +196,3 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time'
         )
-
-
-# class FavoriteShoppingCartSerializer(serializers.ModelSerializer):
-#     image = Base64ImageField()
-
-#     class Meta:
-#         model = Recipe
-#         fields = (
-#             'id',
-#             'name',
-#             'image',
-#             'cooking_time'
-#         )
-
-#     def validate(self, data):
-#         if Favorite.objects.filter(
-#             user=self.request.user,
-#             recipe=recipe
-#         ).exists():
-#             return Response(
-#                 {'errors': 'Рецепт уже добавлен в избранное!'},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-#         return data
