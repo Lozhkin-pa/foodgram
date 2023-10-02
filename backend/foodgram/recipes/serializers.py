@@ -150,7 +150,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Отсутствуют теги!')
         return data
 
-    def __add_ingredients(recipe, ingredients_data):
+    def __add_ingredients(self, recipe, ingredients_data):
         IngredientRecipe.objects.bulk_create(
             IngredientRecipe(
                 recipe=recipe,

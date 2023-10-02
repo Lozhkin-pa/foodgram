@@ -34,7 +34,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        return obj.subscribers.filter(user=request.user).exists()
+        return obj.author.subscribers.filter(user=request.user).exists()
         # return Subscriptions.objects.filter(
         #     user=request.user,
         #     author=obj.author
@@ -44,7 +44,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         limit = request.query_params.get('recipes_limit')
         # recipes = Recipe.objects.filter(author=obj.author)
-        recipes = obj.recipes.filter(author=obj.author)
+        recipes = obj.author.recipes.filter(author=obj.author)
         if limit:
             recipes = recipes[:int(limit)]
         serializer = RecipeSerializer(recipes, many=True)
@@ -52,7 +52,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         # recipes = Recipe.objects.filter(author=obj.author)
-        recipes = obj.recipes.filter(author=obj.author)
+        recipes = obj.author.recipes.filter(author=obj.author)
         return recipes.count()
 
     class Meta:
