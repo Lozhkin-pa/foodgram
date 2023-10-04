@@ -137,9 +137,20 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if 'recipe_ingredients' not in data:
-            raise serializers.ValidationError('Отсутствуют ингредиенты!')
+            raise serializers.ValidationError(
+                {'errors': 'Отсутствуют ингредиенты!'}
+            )
         if 'tags' not in data:
-            raise serializers.ValidationError('Отсутствуют теги!')
+            raise serializers.ValidationError(
+                {'errors': 'Отсутствуют теги!'}
+            )
+        if Recipe.objects.filter(
+            name=data.get('name'),
+            text=data.get('text')
+        ).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Такой рецепт уже существует!'}
+            )
         return data
 
     def __add_ingredients(self, recipe, ingredients_data):
