@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from recipes.models import Tag, Recipe
+from rest_framework import filters
 from django_filters.rest_framework import (
     FilterSet,
     ModelMultipleChoiceFilter,
@@ -48,3 +49,7 @@ class RecipeFilter(FilterSet):
             'is_favorited',
             'is_in_shopping_cart'
         )
+
+
+class IngredientFilter(filters.SearchFilter):
+    search_param = 'name'

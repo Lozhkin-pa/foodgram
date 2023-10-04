@@ -1,7 +1,6 @@
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.filters import SearchFilter
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
     IsAuthenticated
@@ -9,7 +8,7 @@ from rest_framework.permissions import (
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404, HttpResponse
 from django.db.models import Sum
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .models import Tag, Ingredient, Recipe, Favorite, ShoppingCart
 from .serializers import (
     TagSerializer,
@@ -38,7 +37,7 @@ class IngredientViewSet(ListRetrieveViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filter_backends = (SearchFilter,)
+    filter_backends = (IngredientFilter,)
     search_fields = ('^name',)
 
 

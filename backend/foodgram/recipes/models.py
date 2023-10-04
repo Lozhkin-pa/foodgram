@@ -112,7 +112,8 @@ class Recipe(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['name', 'author'],
-                name='unique_name_author'
+                name='unique_name_author',
+                violation_error_message='Рецепт должен быть уникальным!'
             )
         ]
 
@@ -205,6 +206,7 @@ class Favorite(models.Model):
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
                 name='unique_user_recipe_favorite',
+                violation_error_message='Рецепт уже находится в изранном!'
             )
         ]
 
@@ -237,6 +239,7 @@ class ShoppingCart(models.Model):
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
                 name='unique_user_recipe_shopping_cart',
+                violation_error_message='Рецепт уже находится в списке!'
             )
         ]
 
