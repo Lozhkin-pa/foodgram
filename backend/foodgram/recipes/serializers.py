@@ -144,13 +144,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'errors': 'Отсутствуют теги!'}
             )
-        if Recipe.objects.filter(
-            name=data.get('name'),
-            text=data.get('text')
-        ).exists():
-            raise serializers.ValidationError(
-                {'errors': 'Такой рецепт уже существует!'}
-            )
         return data
 
     def __add_ingredients(self, recipe, ingredients_data):
@@ -166,6 +159,13 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         ingredients_data = validated_data.pop('recipe_ingredients')
         tags_data = validated_data.pop('tags')
+        if Recipe.objects.filter(
+            name=validated_data.get('name'),
+            text=validated_data.get('text')
+        ).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Такой рецепт уже существует!'}
+            )
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags_data)
         self.__add_ingredients(recipe, ingredients_data)
